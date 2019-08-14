@@ -72,10 +72,14 @@ def add_to_df(df, results):
 
 def get_initial_df(column_list):
     """ Input:
-            column_list: list of strings
+            None
+        Output:
+            A Pandas DataFrame. The column names are the keys for the first
+            9 fields in the Star Wars API People resource.
     """
+    column_list = ['name','birth_year','eye_color','gender','hair_color',
+                'height','mass','skin_color','homeworld']
     return pd.DataFrame(columns=column_list)
-
 
 
 

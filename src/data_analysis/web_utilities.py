@@ -39,24 +39,31 @@ def log_skipped_url(url):
     with open(filename, 'a') as f:
         f.write(url+'\n')
 
-
-def other_stuff(people_resource, df):
-    df_utilities.add_to_df(df, people_resource['results'])
-    people_resource = get_json(people_resource['next'])
-    other_stuff(people_resource, df)
-
-
-def stuff():
+def build_dataframe(people_resource=None, df=None):
+    """ Input:
+            people_resource: dict - the People resource returned by the Star
+                Wars API.
+            df: Pandas DataFrame - a dataframe which initially has the keys for
+                the first 9 fields in the People dict as its columns. The
+                fields that contain lists are expanded into new columns.
+        Output:
+            df: Pandas DataFrame - a dataframe containing the People data from
+                the Star Wars API.
+    This function will create a Pandas DataFrame, visit the base url for the
+    Star Wars API People resources, and then call itself using the "next" field
+    in the response returned by the GET request, (which contains the url of the
+    next page). This allows us to recursively visit each People page in the
+    API, and put the data into a Pandas DataFrame.
+    """
     base_url = 'http://swapi.co/api/people/'
-    column_list = ['name','birth_year','eye_color','gender','hair_color',
-                    'height','mass','skin_color','homeworld']
-    df = df_utilities.get_initial_df(column_list)
-    people_resource = get_json(base_url)
-    other_stuff(people_resource)
-
-
-
-
+    if not df:
+        df = df_utilities.get_initial_df(column_list)
+        people_resource = get_json(base_url)
+    else:
+        people_resource = get_json(people_resource['next'])
+    df = df_utilities.add_to_df(df, people_resource['results'])
+    df = df_utilities.build_dataframe(people_resource, df)
+    return df
 
 
 

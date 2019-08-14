@@ -81,6 +81,31 @@ def get_initial_df(column_list):
                 'height','mass','skin_color','homeworld']
     return pd.DataFrame(columns=column_list)
 
+def build_dataframe(people_resource=None, df=None):
+    """ Input:
+            people_resource: dict - the People resource returned by the Star
+                Wars API.
+            df: Pandas DataFrame - a dataframe which initially has the keys for
+                the first 9 fields in the People dict as its columns. The
+                fields that contain lists are expanded into new columns.
+        Output:
+            df: Pandas DataFrame - a dataframe containing the People data from
+                the Star Wars API.
+    This function will create a Pandas DataFrame, visit the base url for the
+    Star Wars API People resources, and then call itself using the "next" field
+    in the response returned by the GET request, (which contains the url of the
+    next page). This allows us to recursively visit each People page in the
+    API, and put the data into a Pandas DataFrame.
+    """
+    base_url = 'http://swapi.co/api/people/'
+    if not df:
+        df = get_initial_df(column_list)
+        people_resource = web_utilities.get_json(base_url)
+    else:
+        people_resource = web_utilities.get_json(people_resource['next'])
+    df = add_to_df(df, people_resource['results'])
+    df = build_dataframe(people_resource, df)
+    return df
 
 
 #

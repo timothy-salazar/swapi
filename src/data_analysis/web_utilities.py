@@ -2,7 +2,7 @@ import requests
 import json
 import os
 import pandas as pd
-import df_utilities
+from . import df_utilities
 
 def get_json(url):
     """ Input:

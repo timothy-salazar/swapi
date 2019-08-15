@@ -143,7 +143,8 @@ def col_urls_to_names(df):
     d = dict()
     for i in ['films','species','vehicles','starships']:
         d = {**d, **web_utilities.url_to_val_dict(i)}
-    new_cols = [d[df.columns[i]] for i in np.arange(9,df.shape[1],1)]
+    new_cols = [d[df.columns[i]] if df.columns[i][:8]=='https://' \
+                else df.columns[i] for i in np.arange(9,df.shape[1],1)]
     df.columns = list(df.columns[:9]) + new_cols
     return df
 

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+from . import web_utilities
 
 def get_new_col_name(url):
     """ Input:
@@ -70,7 +70,7 @@ def add_to_df(df, results):
     df = fill_in_with_false(df)
     return df
 
-def get_initial_df(column_list):
+def get_initial_df():
     """ Input:
             None
         Output:
@@ -80,6 +80,53 @@ def get_initial_df(column_list):
     column_list = ['name','birth_year','eye_color','gender','hair_color',
                 'height','mass','skin_color','homeworld']
     return pd.DataFrame(columns=column_list)
+
+def star_date_to_float(x):
+    """ Input:
+            x: string - a date using the Star Wars calendar, or 'unknown'.
+
+        Output:
+            Either the date as a negative float if x ended in BBY, a positive
+            float if x ended in ABY, or NaN if x was 'unknown'
+
+    If the string ends with BBY, it indicates that the person was born before
+    the Battle of Yavin. If the string ends with ABY it indicates that the
+    person was born after tbe Battle of Yavin. There are no ABY dates included
+    in the birth_year column, but I'll write this to handle the ABY case anyway,
+    I might need it later.
+    """
+    if x[-3:] == 'BBY': return -float(x[:-3])
+    elif x[-3:] == 'ABY': return float(x[:-3])
+    else: return np.NaN
+
+def format_birth_year(s):
+    """ Input:
+            s: Series - a Pandas Series containing strings. These are dates
+                ending in BBY or ABY, or 'unknown'
+        Output:
+            A series containing the same dates as floats. If the original dates
+            ended in BBY, they will be negative. If the original string was
+            'unknown', it will be replaced with NaN
+    """
+    if s.dtype == 'float64':    # prevent this from raising an error if run
+        return s                # multiple times
+    return s.apply(lambda x: star_date_to_float(x))
+
+def world_url_to_name(s):
+    """ Input:
+            s: Series - a Pandas Series containing strings. These are urls
+                corresponding to planets.
+        Output:
+            A series in which the urls have been replaced with the name of the
+            planet located at that location.
+    """
+    world_dict = web_utilities.get_world_dict()
+    return s.apply(lambda x: world_dict[x] if x[:8] == 'https://' else x)
+
+def cleanup(df):
+    df['homeworld'] = world_url_to_name(df['homeworld'])
+    df['birth_year'] = format_birth_year(df['birth_year'])
+    return df
 
 def build_dataframe(people_resource=None, df=None):
     """ Input:
@@ -98,13 +145,14 @@ def build_dataframe(people_resource=None, df=None):
     API, and put the data into a Pandas DataFrame.
     """
     base_url = 'http://swapi.co/api/people/'
-    if not df:
-        df = get_initial_df(column_list)
+    if not people_resource:
+        df = get_initial_df()
         people_resource = web_utilities.get_json(base_url)
     else:
         people_resource = web_utilities.get_json(people_resource['next'])
-    df = add_to_df(df, people_resource['results'])
-    df = build_dataframe(people_resource, df)
+    if people_resource:
+        df = add_to_df(df, people_resource['results'])
+        df = build_dataframe(people_resource, df)
     return df
 
 

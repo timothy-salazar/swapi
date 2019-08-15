@@ -1,9 +1,7 @@
-from data_analysis import web_utilities, df_utilities
+from data_analysis import df_utilities
 
 
-
-
-main():
+def main():
     df = df_utilities.build_dataframe()
 
 

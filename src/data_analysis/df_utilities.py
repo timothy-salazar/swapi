@@ -65,7 +65,7 @@ def add_to_df(df, results):
         # value, and sets these to True.
         for c in non_row_keys:
             for j in i[c]:
-                row_dict[get_new_col_name(j)] = True
+                row_dict[j] = True
         df = df.append([row_dict], sort=False, ignore_index=True)
     df = fill_in_with_false(df)
     return df
@@ -120,12 +120,48 @@ def world_url_to_name(s):
             A series in which the urls have been replaced with the name of the
             planet located at that location.
     """
-    world_dict = web_utilities.get_world_dict()
+    world_dict = web_utilities.url_to_val_dict('planets')
     return s.apply(lambda x: world_dict[x] if x[:8] == 'https://' else x)
 
+def col_urls_to_names(df):
+    """ Input:
+            df: Pandas DataFrame
+        Output:
+            df: Pandas DataFrame
+
+    Some of the fields returned by the Star Wars API are lists, and we expanded
+    these into new columns. These lists contain urls that refer to resources
+    located elsewhere, so I took each new url and turned it into a column -
+    with a value of True or False depending on whether it was applicable to a
+    given row.
+    This function first builds a dictionary in which the keys are urls, and the
+    values are names. So "https://swapi.co/api/films/1/" would correspond to the
+    value "A New Hope", etc.
+    It then goes through the new columns we added, converts the unintuitive url
+    column names to values that make sense, and updates the dataframe with them.
+    """
+    d = dict()
+    for i in ['films','species','vehicles','starships']:
+        d = {**d, **web_utilities.url_to_val_dict(i)}
+    new_cols = [d[df.columns[i]] for i in np.arange(9,df.shape[1],1)]
+    df.columns = list(df.columns[:9]) + new_cols
+    return df
+
 def cleanup(df):
+    """ Input:
+            df: Pandas DataFrame
+        Output:
+            df: Pandas DataFrame
+    Runs a number of functions to clean up the dataframe. This includes
+    replacing the url in the "homeworld" field with the actual name of the
+    planet, replacing the urls in the column names with the film, species,
+    vehicle, and starship names that they're standing in for, and formatting
+    the "birth_year" column.
+
+    """
     df['homeworld'] = world_url_to_name(df['homeworld'])
     df['birth_year'] = format_birth_year(df['birth_year'])
+    df = col_urls_to_names(df)
     return df
 
 def build_dataframe(people_resource=None, df=None):

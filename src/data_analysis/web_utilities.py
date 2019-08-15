@@ -38,7 +38,7 @@ def log_skipped_url(url):
     try:
         filename = os.path.join(os.environ['LOG_DIR'],'skipped_url.log')
     except KeyError:
-        filename = os.path.join('assets','logs','skipped_url.log')
+        filename = get_asset_path('logs','skipped_url_log')
     with open(filename, 'a') as f:
         f.write(url+'\n')
 
@@ -70,14 +70,15 @@ def url_to_val_dict(api_cat):
         while url != None:
             r = get_json(url)
             for i in r['results']:
-                d[i['url']]=i['name']
+                if api_cat == 'films': d[i['url']]=i['title']
+                else: d[i['url']]=i['name']
             url = r['next']
         with open(json_path, 'w') as f:
             f.write(json.dumps(d))
     else:
         with open(json_path, 'r') as f:
             d = json.load(f)
-            print('Json loaded!')
+            print('{} JSON loaded!'.format(api_cat))
     return d
 
     #

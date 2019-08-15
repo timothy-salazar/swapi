@@ -3,7 +3,6 @@ import json
 import os
 import pandas as pd
 import time
-#from . import df_utilities
 
 def get_json(url):
     """ Input:

@@ -25,7 +25,7 @@ def fill_in_with_false(df):
         NaN. This goes through and replaces the NaNs we produced in add_to_df()
         with False
     """
-    for c in df.columns[9:]:
+    for c in df.columns[10:]:
         df[c][df[c].isna()] = False
     return df
 
@@ -39,7 +39,7 @@ def add_to_df(df, results):
                 values for these new columns will be True if valid for the
                 person in that row, False otherwise.
 
-        This works by making a new dataframe for each row. The first 9 columns
+        This works by making a new dataframe for each row. The first 10 columns
         contain the data that can be translated directly from the dictionary
         returned from the Star Wars API. A new column is created for each item
         in 'non_row_keys'. For example, the 'starships' field in the dictionary
@@ -54,18 +54,24 @@ def add_to_df(df, results):
         The NaNs are replaced with False by the fill_in_with_false() function.
     """
     # dictionary keys that aren't being made directly into rows (lists)
-    non_row_keys = ['films','species','starships','vehicles']
+    non_row_keys = ['films','starships','vehicles']
     for i in results:
         row_dict = dict()
         # grabs the fields that can be put into our df w/o modification
-        for c in df.columns[:9]:
-            row_dict[c] = i[c]
+        for c in df.columns[:10]:
+            # the 'species' field is a list, but it contains either 1 or 0
+            # values in all cases. No hybrids in Star Wars I guess.
+            if c == 'species':
+                row_dict[c] = i[c][0] if len(i[c]) > 0 else np.nan
+            else: row_dict[c] = i[c]
         # ugly solution, but I want to get a minimum viable product.
         # takes values from fields containing lists, makes columns for each
         # value, and sets these to True.
         for c in non_row_keys:
             for j in i[c]:
                 row_dict[j] = True
+        # special case - seeing what happens
+        # row_dict['species'] = i['species']
         df = df.append([row_dict], sort=False, ignore_index=True)
     df = fill_in_with_false(df)
     return df
@@ -75,10 +81,10 @@ def get_initial_df():
             None
         Output:
             A Pandas DataFrame. The column names are the keys for the first
-            9 fields in the Star Wars API People resource.
+            10 fields in the Star Wars API People resource.
     """
     column_list = ['name','birth_year','eye_color','gender','hair_color',
-                'height','mass','skin_color','homeworld']
+                'height','mass','skin_color','homeworld', 'species']
     return pd.DataFrame(columns=column_list)
 
 def star_date_to_float(x):
@@ -123,9 +129,11 @@ def world_url_to_name(s):
     world_dict = web_utilities.url_to_val_dict('planets')
     return s.apply(lambda x: world_dict[x] if x[:8] == 'https://' else x)
 
-def col_urls_to_names(df):
+def urls_to_names(df, col_name=None):
     """ Input:
             df: Pandas DataFrame
+            col_name: None or string. If none, replaces the column names.
+                Otherwise replaces the entries in column 'col_name'
         Output:
             df: Pandas DataFrame
 
@@ -143,10 +151,14 @@ def col_urls_to_names(df):
     d = dict()
     for i in ['films','species','vehicles','starships']:
         d = {**d, **web_utilities.url_to_val_dict(i)}
-    new_cols = [d[df.columns[i]] if df.columns[i][:8]=='https://' \
-                else df.columns[i] for i in np.arange(9,df.shape[1],1)]
-    df.columns = list(df.columns[:9]) + new_cols
-    return df
+    if not col_name:
+        new_cols = [d[df.columns[i]] if df.columns[i][:8]=='https://' \
+                    else df.columns[i] for i in np.arange(10,df.shape[1],1)]
+        df.columns = list(df.columns[:10]) + new_cols
+        return df
+    else:
+        df[col_name] = [d[i] if i in d else np.nan for i in df[col_name]]
+        return df
 
 def cleanup(df):
     """ Input:
@@ -162,7 +174,8 @@ def cleanup(df):
     """
     df['homeworld'] = world_url_to_name(df['homeworld'])
     df['birth_year'] = format_birth_year(df['birth_year'])
-    df = col_urls_to_names(df)
+    df = urls_to_names(df)
+    df = urls_to_names(df, col_name='species')
     return df
 
 def build_dataframe(people_resource=None, df=None):
@@ -170,7 +183,7 @@ def build_dataframe(people_resource=None, df=None):
             people_resource: dict - the People resource returned by the Star
                 Wars API.
             df: Pandas DataFrame - a dataframe which initially has the keys for
-                the first 9 fields in the People dict as its columns. The
+                the first 10 fields in the People dict as its columns. The
                 fields that contain lists are expanded into new columns.
         Output:
             df: Pandas DataFrame - a dataframe containing the People data from

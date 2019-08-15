@@ -5,6 +5,6 @@ assets/fonts/stjelogo/*.jpg
 assets/fonts/starjout/*.doc
 assets/fonts/starjout/*.jpg
 assets/fonts/stjedise/
-assets/old_dataframe.csv
+assets/old_dataframe*
 .ipynb_checkpoints
 __pycache__/

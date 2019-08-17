@@ -33,3 +33,7 @@ to the nice bell curve we'd expect.
 ## Question 2:
 
 ![Gender vs. Movie](assets/images/movie_vs_gender.jpg)
+Just some bar graphs. This tells us a little bit, but we might be able to see the actual trends better if we put it all on one graph.
+
+![Gender vs. Movie](assets/images/gender_film_lines2.jpg)
+This is a bit better. 

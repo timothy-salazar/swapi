@@ -61,8 +61,9 @@ def add_to_df(df, results):
         for c in df.columns[:10]:
             # the 'species' field is a list, but it contains either 1 or 0
             # values in all cases. No hybrids in Star Wars I guess.
+            # using 'unknown' following this API's conventions.
             if c == 'species':
-                row_dict[c] = i[c][0] if len(i[c]) > 0 else np.nan
+                row_dict[c] = i[c][0] if len(i[c]) > 0 else 'unknown'
             else: row_dict[c] = i[c]
         # ugly solution, but I want to get a minimum viable product.
         # takes values from fields containing lists, makes columns for each
@@ -149,7 +150,7 @@ def urls_to_names(df, col_name=None):
     column names to values that make sense, and updates the dataframe with them.
     """
     d = dict()
-    for i in ['films','species','vehicles','starships']:
+    for i in ['planets','films','species','vehicles','starships']:
         d = {**d, **web_utilities.url_to_val_dict(i)}
     if not col_name:
         new_cols = [d[df.columns[i]] if df.columns[i][:8]=='https://' \
@@ -157,8 +158,19 @@ def urls_to_names(df, col_name=None):
         df.columns = list(df.columns[:10]) + new_cols
         return df
     else:
-        df[col_name] = [d[i] if i in d else np.nan for i in df[col_name]]
+        df[col_name] = [d[i] if i[:8]=='https://' else i for i in df[col_name]]
         return df
+
+def replace_unknown(df, cols):
+    for i in cols:
+        df[i] = [j if j != 'unknown' else np.nan for j in df[i]]
+    return df
+
+def replace_na(df, cat_rep):
+    for i in cat_rep:
+        c, d = i[0],i[1]
+        df[c] = [d[j] if j in d.keys() else j for j in df[c]]
+    return df
 
 def cleanup(df):
     """ Input:
@@ -172,10 +184,19 @@ def cleanup(df):
     the "birth_year" column.
 
     """
-    df['homeworld'] = world_url_to_name(df['homeworld'])
+    float_cols = ['birth_year','height','mass','skin_color']
+    # Pandas will interpret 'n/a' as NaN if it reads this dataframe
+    # from a csv. 'n/a' is significant, however - it doesn't mean
+    # that there isn't a value there.
+    category_replacements = [['eye_color',{'n/a':'no eyes'}],
+                            ['gender',{'n/a':'no gender'}],
+                            ['hair_color',{'n/a':'no hair'}]]
     df['birth_year'] = format_birth_year(df['birth_year'])
+    df = urls_to_names(df, col_name='homeworld')
     df = urls_to_names(df)
     df = urls_to_names(df, col_name='species')
+    df = replace_unknown(df, float_cols)
+    df = replace_na(df,category_replacements)
     return df
 
 def build_dataframe(people_resource=None, df=None):
@@ -204,6 +225,8 @@ def build_dataframe(people_resource=None, df=None):
         df = add_to_df(df, people_resource['results'])
         df = build_dataframe(people_resource, df)
     return df
+
+
 
 
 #

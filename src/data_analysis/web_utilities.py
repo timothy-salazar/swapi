@@ -52,7 +52,7 @@ def get_asset_path(*args):
     a = os.path.dirname(os.path.abspath(__file__))
     return os.path.normpath(os.path.join(a, '..','..','assets',*args))
 
-def url_to_val_dict(api_cat):
+def url_to_val_dict(api_cat,v=True):
     """ Input:
             api_cat: string - the category we want to build dictionary for
         Output:
@@ -77,7 +77,7 @@ def url_to_val_dict(api_cat):
     else:
         with open(json_path, 'r') as f:
             d = json.load(f)
-            print('{} JSON loaded!'.format(api_cat))
+            if v: print('{} JSON loaded!'.format(api_cat))
     return d
 
     #

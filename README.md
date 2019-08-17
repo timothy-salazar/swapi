@@ -17,14 +17,19 @@ other ideas, questions or insights from the data, we’d love to see those as we
 ## Question 1:
 
 ![Height vs. Gender](assets/images/height_vs_gender.jpg)
-
 There are far fewer females to work with, but we can get a general idea of the distribution of height vs. gender from this histogram.
 
 ![Height vs. homeworld](assets/images/height_vs_world.jpg)
-
 This isn't nearly as clear-cut as the first example, since most of the planets in the database have only one named inhabitant. 
 The most populous worlds are pictured here. Tatooine and Naboo have 10 and 11 named inhabitants respectively, the rest that
 I created histograms for only had 3, but I thought I'd include them anyway - we're doing this is all for illustrative 
 purposes, we're not looking for statistical rigor.
 
 ![Height vs. species](assets/images/height_vs_species.jpg)
+This could also be better - again, because of small sample sizes. These histograms show 35 humans, 5 droids, and 3 gungans. 
+The human histogram looks more or less alrigh, but the other two populations are just too small to show something close
+to the nice bell curve we'd expect.
+
+## Question 2:
+
+![Gender vs. Movie](assets/images/movie_vs_gender.jpg)

@@ -39,3 +39,26 @@ Just some bar graphs. This tells us a little bit, but we might be able to see th
 ![Gender vs. Movie](assets/images/gender_film_lines2.jpg)
 
 This is a bit better. 
+
+# Question 3 
+Back to our difficult-to-explain interest in heights: can you find and visualize a linear regression that clearly explains the height of an individual? 
+
+# Linear Regression
+A lot of people sneer at linear regression because it isn't as shiny as the newer, more complicated models that are available. But linear regression has a lot of advantages, and it's often the best model for a problem.
+- It's interpretable - an advantage that many more complicated models, such as neural networks, lack
+- It's simple, which means it's easy to get up and running quickly
+
+Linear regression has relatively high bias and low variance, which means that it's a little bit harder to overfit than some more complicated models. There is a limit though - and each variable that we add to our model will make it easier to overfit. It's probably a good idea to use just a few of these columns to fit our model. 
+
+Additionally, we need to put our data into a form that our linear regression can "understand". If we want to use columns that have non-numerical values, first we'll need to transform them into numbers.
+
+# Feature Engineering
+"birth_year" and "mass" are the only variables that are are numerical. We'll need to transform the rest of our data to make it fit. The biggest problem with these two values is the relatively large number of missing values (especially with birth_year.
+- eye_color - the most common colors are brown and blue. There is a wide variety of more exotic colors, so I think an "is brown or blue" column would make sense.
+- gender - the "Gender Across Films" graph above is a bit deceptive, since the same droids tend to appear across a lot of films. They only really represent 5 datapoints. I'll do an "is female" column.
+- hair_color - I'll make this into an "is bald" column
+- mass - this is fine 
+- skin_color - I'll say that everything that isn't "fair","light","dark" is an unusual skin color
+- homeworld - skiping this one
+- species - human and other
+

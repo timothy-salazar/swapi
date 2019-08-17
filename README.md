@@ -61,5 +61,6 @@ Additionally, we need to put our data into a form that our linear regression can
 - skin_color - I'll say that everything that isn't "fair","light","dark" is an unusual skin color
 - homeworld - skiping this one
 - species - human and other
-
+## Results
+By dropping "birth_year" and keeping the rest of my engineered features, I was able to get an R^2 score of 0.79. The R^2 statistic is basically tells us how much of the variability in the data our model can account for. A score of .79 means that our model can account for about 80% of the variability. There are only 87 data points, and our data doesn't necessarily map onto any actual ground truth since these aren't people drawn at random from a population, they're actors cast into roles. This is demonstrated best by the distribution of genders, which is 50/50 in the real world (and presumably in the Star Wars universe), but which is heavily skewed towards males in the data we are given. 
 ![model prediction](assets/images/predicted_height_vs_mass.jpg)

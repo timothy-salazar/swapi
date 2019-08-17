@@ -190,6 +190,7 @@ def cleanup(df):
     # that there isn't a value there.
     category_replacements = [['eye_color',{'n/a':'no eyes'}],
                             ['gender',{'n/a':'no gender'}],
+                            ['gender',{'none':'no gender'}],
                             ['hair_color',{'n/a':'no hair'}]]
     df['birth_year'] = format_birth_year(df['birth_year'])
     df = urls_to_names(df, col_name='homeworld')

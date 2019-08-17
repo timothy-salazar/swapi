@@ -62,3 +62,4 @@ Additionally, we need to put our data into a form that our linear regression can
 - homeworld - skiping this one
 - species - human and other
 
+![model prediction](assets/images/predicted_height_vs_mass.jpg)

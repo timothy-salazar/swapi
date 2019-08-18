@@ -6,9 +6,11 @@ from matplotlib import font_manager as fm
 from PIL import Image
 from astropy.visualization import hist
 from scipy.stats import norm
+import os
 
 def axis_style(ax,title,legend=False,alpha=.1):
-    fpath = './assets/fonts/starjedi/Starjedi.ttf'
+    asset_dir = os.environ['ASSET_DIR']
+    fpath = os.path.join(asset_dir,'fonts','starjedi','Starjedi.ttf' )
     prop = fm.FontProperties(fname=fpath)
     ax.patch.set_facecolor((1, 1, 1, alpha))
     ax.patch.set_linewidth(2)
@@ -21,18 +23,20 @@ def axis_style(ax,title,legend=False,alpha=.1):
         plt.legend(loc='upper right',prop=prop, bbox_to_anchor=[1,.95])
     return ax
 
-def make_it_cool(fig, col_vals, bbox, main_title,mt_size):
-    fpath = './assets/fonts/stjelogo/Stjldbl2.ttf'
+def make_it_cool(fig, col_vals, bbox, main_title, mt_size, alpha=.1):
+    asset_dir = os.environ['ASSET_DIR']
+    fpath = os.path.join(asset_dir,'fonts','stjelogo','Stjldbl2.ttf' )
     prop = fm.FontProperties(fname=fpath)
     fig.get_children()[1].axis("off")
     fig.get_children()[1].set_position(bbox)
     if len(fig.get_children()) > 3:
         for i, title in zip(fig.get_children()[2:], col_vals):
-            i = axis_style(i,title)
+            i = axis_style(i,title,alpha)
     else:
         pass
     fig.suptitle(main_title,fontproperties=prop,
                  color='#FFE81F', fontsize=mt_size)
+    return fig
 
 def union_not_nan_mask(df, col1, col2, val):
     if val.lower()[:3] in {'any', 'all'}:
@@ -50,9 +54,10 @@ def match_hist_color(fig):
          if type(i) == matplotlib.patches.Polygon]
     return p_list[-1].get_facecolor()
 
-def get_scaled_img(fig):
+def get_scaled_img(fig,imname='starfield.png'):
     fig_size = fig.get_size_inches()*fig.dpi
-    img = Image.open('assets/images/starfield.png')
+    impath = os.path.join(os.environ['ASSET_DIR'],'images',imname)
+    img = Image.open(impath)
     img_size = img.size
     a = [i - j for i,j in zip(fig_size, img_size)]
     b = [0,0]

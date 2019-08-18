@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# This is a simple script that will add a few variables to the 
+# Hensel Phelps anaconda environment.
+#
+# SRC_DIR - the absolute path to the src/ directory
+# ASSET_DIR - the absolute path to the assets/ directory
+#
+# If we save these to the proper location in the directory 
+# for the hensel_phelps anaconda environment, we can let
+# anaconda take care of exporting/unsetting these variables. 
+#
+ASSET_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SWAPI_DIR=`echo $ASSET_DIR | rev | cut -d'/' -f2- | rev`
+echo $SWAPI_DIR/stuff
+SRC_DIR=$SWAPI_DIR/src
+echo $SRC_DIR
+pattern="envs directories"
+a=`conda info | grep "$pattern"`
+BASE_ENV_DIR=`echo $a | cut -d ' ' -f4-`
+echo "Found base anaconda directory:" $BASE_ENV_DIR
+ENV_DIR=$BASE_ENV_DIR/hensel_phelps
+echo "Found Hensel Phelps Conda environment directory:"$ENV_DIR
+# Create directories for the activate/deactivate scripts
+mkdir -p $ENV_DIR/etc/conda/activate.d
+mkdir -p $ENV_DIR/etc/conda/deactivate.d
+# Create the .sh files where we will put our environment variables
+touch $ENV_DIR/etc/conda/activate.d/env_vars.sh
+ACTIVATE_SCRIPT=$ENV_DIR/etc/conda/activate.d/env_vars.sh
+echo $ACTIVATE_SCRIPT
+touch $ENV_DIR/etc/conda/deactivate.d/env_vars.sh
+DEACTIVATE_SCRIPT=$ENV_DIR/etc/conda/deactivate.d/env_vars.sh
+# write the SRC_DIR and ASSET_DIR to shell scripts in the conda env
+# directories activate.d and deactivate.d
+# These will be run by conda when the environment is activated and 
+# deactivated, adding or removing the environment variables.
+/bin/cat <<EOM>>$ACTIVATE_SCRIPT
+#!/bin/bash
+
+export SRC_DIR="$SRC_DIR"
+export ASSET_DIR="$ASSET_DIR"
+EOM
+/bin/cat <<EOM>>$DEACTIVATE_SCRIPT
+#!/bin/bash
+
+unset SRC_DIR
+unset ASSET_DIR
+EOM
+echo "Saved environment variable activate/deactivate scripts."

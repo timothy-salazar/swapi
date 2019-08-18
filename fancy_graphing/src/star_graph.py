@@ -38,18 +38,44 @@ def make_it_cool(fig, col_vals, bbox, main_title, mt_size, alpha=.1):
                  color='#FFE81F', fontsize=mt_size)
     return fig
 
-def union_not_nan_mask(df, col1, col2, val):
-    if val.lower()[:3] in {'any', 'all'}:
-        uindex = [True if not (pd.isna(df.loc[i][col1]) or pd.isna(df.loc[i][col2]))
-                  else False for i in range(df.shape[0])]
-        return uindex
-    else:
-        return df.apply(lambda x: True if ((x[col1] == val)\
-                        and (x[col2] != 'unknown')\
-                        and not (pd.isna(x[col2])))\
-                        else False, axis = 1)
+def intersect_not_nan_mask(df, col1, col2, val='any'):
+    """ Input:
+            df: Pandas DataFrame
+            col1: first column of intersection
+            col2: second column of intersection
+            val: the values in column 1 for which we want a mask
+        Output:
+            mask of bool values.
+        Example:
+            If we were interested in the "species" and "height" columns of our
+            dataframe, and we wanted to get the rows where species AND height
+            both had valid (not NaN or "unknown") values, we could pass this
+            function df=df, col1="species", col2="height"
+            If we wanted a little more refinement, we could ask for the rows
+            where "species" is "Human" and height is not NaN or "unknown" by
+            passing this function df=df, col1="species", col2="height",
+            val="Human".
+    """
+    if val.lower()[:3] in {'any', 'all'}: mask = [True] * df.species.shape[0]
+    else: mask = df[col1] == val
+    '''I tried to make this readable, but it still might be a little
+    cryptic. Using lambda functions and apply is a lot faster than
+    iterating through the items in the dataframe though (moving from pandas
+    space into python space always slows us down a lot)'''
+    return df[mask].apply(lambda x: True if not (pd.isna(x[col1]) \
+            or (x[col1]=='unknown') or pd.isna(x[col2]) \
+            or (x[col2]=='unknown')) else False, axis=1)
+
 
 def match_hist_color(fig):
+    """ Input:
+            fig: matplotlib figure
+        Output:
+            color: color
+    For the last axes created on the figure, retrieves the last polygon drawn
+    and returns the facecolor. So, if a histogram was the last item plotted, 
+    this will return the color used to fill the bins.
+    """
     p_list = [i for i in fig.axes[-1].get_children()
          if type(i) == matplotlib.patches.Polygon]
     return p_list[-1].get_facecolor()

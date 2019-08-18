@@ -12,9 +12,10 @@
 #
 ASSET_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SWAPI_DIR=`echo $ASSET_DIR | rev | cut -d'/' -f2- | rev`
-echo $SWAPI_DIR/stuff
 SRC_DIR=$SWAPI_DIR/src
-echo $SRC_DIR
+echo "Adding 'SRC_DIR' environment variable:" $SRC_DIR
+GRAPH_DIR=$SWAPI_DIR/fancy_graphing/src
+echo "Adding 'GRAPH_DIR' environment variable:" $GRAPH_DIR
 pattern="envs directories"
 a=`conda info | grep "$pattern"`
 BASE_ENV_DIR=`echo $a | cut -d ' ' -f4-`
@@ -39,11 +40,13 @@ DEACTIVATE_SCRIPT=$ENV_DIR/etc/conda/deactivate.d/env_vars.sh
 
 export SRC_DIR="$SRC_DIR"
 export ASSET_DIR="$ASSET_DIR"
+export GRAPH_DIR="$GRAPH_DIR"
 EOM
 /bin/cat <<EOM>>$DEACTIVATE_SCRIPT
 #!/bin/bash
 
 unset SRC_DIR
 unset ASSET_DIR
+unset GRAPH_DIR
 EOM
 echo "Saved environment variable activate/deactivate scripts."

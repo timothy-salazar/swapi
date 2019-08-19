@@ -9,6 +9,12 @@ from scipy.stats import norm
 import os
 
 def axis_style(ax,title,alpha=.1):
+    """ Input:
+            ax: matplotlib axes.
+            title: string - the title for the axes
+            alpha: float - the alpha to be applied to the background of the
+                axes.
+    """
     asset_dir = os.environ['ASSET_DIR']
     fpath = os.path.join(asset_dir,'fonts','starjedi','Starjedi.ttf' )
     prop = fm.FontProperties(fname=fpath)
@@ -20,8 +26,19 @@ def axis_style(ax,title,alpha=.1):
     ax.spines['bottom'].set_color('white')
     return ax
 
-def make_it_cool(fig, col_vals, bbox, main_title, mt_size,
-                    alpha=.1):
+def make_it_cool(fig, col_vals, bbox, main_title, mt_size, alpha=.1):
+    """ Input:
+            fig: matplotlib figure
+            col_vals: a list containing the values within "col1" that we're
+                interested in
+            bbox: sequence - this will be treated as a matplotlib boundary box
+                for the purposes of setting the position for the background
+                image
+            main_title: string - the title of the entire figure
+            mt_size: int or string - the size of the main title text.
+            alpha: float - the alpha to be applied to the background of the axes.
+                A small value is used so the star image will show through.
+    """
     asset_dir = os.environ['ASSET_DIR']
     fpath = os.path.join(asset_dir,'fonts','stjelogo','Stjldbl2.ttf' )
     prop = fm.FontProperties(fname=fpath)
@@ -83,7 +100,13 @@ def match_hist_color(fig):
     return p_list[-1].get_facecolor()
 
 def get_scaled_img(fig,imname='starfield.png'):
-    """
+    """ Input:
+            fig: matplotlib figure
+            imname: the name of the figure contained within the "assets/images"
+                directory that we'd like to use as a background image
+        Output:
+            img: an image that has been cropped and scaled so that it will fit
+                the background of fig without any distortion
     """
     fig_size = fig.get_size_inches()*fig.dpi
     impath = os.path.join(os.environ['ASSET_DIR'],'images',imname)
@@ -102,6 +125,25 @@ def get_scaled_img(fig,imname='starfield.png'):
 
 def plot_in_cols(quant_list, col1_vals, graph_width, hmin, hmax,
                  bin_val, htype, title_str):
+    """ Input:
+            quant_list: list - for each item in col1_vals "i", this list
+                contains a corresponding item. This item is a list containing
+                a boolean index. If the item in col1 has a value of "i", and
+                the corresponding item in col2 exists and is not "unknown",
+                then it has a value of True, otherwise it has a value of False.
+            col1_vals: a list containing the names of the items in col1 for
+                which we want to make comparison graphs
+            graph_width: int - the width of the graph in inches
+            hmin: int - the smallest value contained in col2
+            hmax: int - the largest value contained in col2
+            bin_val: string - the binning algorithm to be used
+            htype: the type of histogram to draw
+            title_str: string - a string which will be made into the title in
+                the following way:
+                    title_str.format("value contained in x_vals")
+                With the current setup, the unmodified x_val entry will be
+                displayed as the title.
+    """
     clen = len(col1_vals)
     ax_list = []
     plot_height = clen // 2 + clen % 2
@@ -127,6 +169,22 @@ def plot_in_cols(quant_list, col1_vals, graph_width, hmin, hmax,
 
 def plot_single_axis(quant_list, col1_vals, graph_width, hmin, hmax,
                      bin_val, htype, add_legend=True):
+    """ Input:
+            quant_list: list - for each item in col1_vals "i", this list
+                contains a corresponding item. This item is a list containing
+                a boolean index. If the item in col1 has a value of "i", and
+                the corresponding item in col2 exists and is not "unknown",
+                then it has a value of True, otherwise it has a value of False.
+            col1_vals: a list containing the names of the items in col1 for
+                which we want to make comparison graphs
+            graph_width: int - the width of the graph in inches
+            hmin: int - the smallest value contained in col2
+            hmax: int - the largest value contained in col2
+            bin_val: string - the binning algorithm to be used
+            htype: the type of histogram to draw
+            add_legend: should a legend be added?
+
+    """
     clen = len(col1_vals)
     fig, ay = plt.subplots(figsize=(graph_width,graph_width))
     img = get_scaled_img(fig)
@@ -154,6 +212,39 @@ def plot_df_hist(df, col1, col1_vals, col2='height', graph_width=10,
                     plot_type='cols', bin_val='freedman', htype='stepfilled',
                     title_str='{}', bbox = [.05,.05,.95,.95],
                     main_title="Height Across Species",mt_size=36):
+    """ Inputs:
+            df: Pandas DataFrame - contains the data we want to graph
+            col1: string - the name of the column containing the independent
+                variable
+            col1_vals: list of strings - contains the values by we want to
+                compare. For example: if col1 was "species", col1_vals might
+                contain a list of specific species for which we wanted to see
+                histograms.
+            col2: string - the name of the column containing the dependent
+                variable. For example, if col1 was species, and col1_vals was
+                a list of specific species (['Human', 'Droid', 'Gungan'], for
+                example), then col2 would contain something like "height" -
+                and this function would plot histograms showing the distribution
+                of heights across these species
+            graph_width: int - the width of the graph to be outputted, in inches
+            plot_type: string - if "cols", each item in col1_vals will be given
+                a different axes, and these axes will be plotted in two row.
+            bin_val: string - the binning algorithm to be used.
+            htype: string - how should the histogram be drawn
+            title_str: string - a string which will be made into the title in
+                the following way:
+                    title_str.format("value contained in x_vals")
+                With the current setup, the unmodified x_val entry will be
+                displayed as the title.
+            bbox: sequence - this will be treated as a matplotlib boundary box
+                for the purposes of setting the position for the background
+                image
+            main_title: string - the title of the entire figure
+            mt_size: int or string - the size of the main title text.
+        Output:
+            fig: matplotlib figure
+            ax: matplotlib axes, or a sequence of axes
+    """
     ax_list = []
     hmax = 0
     hmin = 500

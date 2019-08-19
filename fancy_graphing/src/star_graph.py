@@ -14,6 +14,8 @@ def axis_style(ax,title,alpha=.1):
             title: string - the title for the axes
             alpha: float - the alpha to be applied to the background of the
                 axes.
+        sets the alpha of the axes to a small number so the background image
+        can be seen. adds a title in a cool star wars font.
     """
     asset_dir = os.environ['ASSET_DIR']
     fpath = os.path.join(asset_dir,'fonts','starjedi','Starjedi.ttf' )
@@ -38,6 +40,8 @@ def make_it_cool(fig, col_vals, bbox, main_title, mt_size, alpha=.1):
             mt_size: int or string - the size of the main title text.
             alpha: float - the alpha to be applied to the background of the axes.
                 A small value is used so the star image will show through.
+        sets the position of the background image. adds a title to the figure
+        in a cool star wars font.
     """
     asset_dir = os.environ['ASSET_DIR']
     fpath = os.path.join(asset_dir,'fonts','stjelogo','Stjldbl2.ttf' )

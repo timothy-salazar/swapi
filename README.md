@@ -2,6 +2,8 @@
 
 ### Minimum Viable Product
 
+[Click here](https://github.com/timothy-salazar/swapi/tree/master/fancy_graphing) for the fancy graphs.
+
 1. It seems like there is quite a variety of heights in the Star Wars Universe. Show us the distribution of
 heights across gender, homeworld, and species.
 2. The Original Trilogy and the Prequel Trilogy both featured men in leading roles and women in
